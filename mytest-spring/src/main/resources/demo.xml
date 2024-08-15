@@ -4,8 +4,13 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-	<bean class="org.mytest.User" id="person">
+	<bean class="org.mytest.User" id="user">
 		<property name="id" value="10"/>
 		<property name="username" value="johnny"/>
 	</bean>
+
+	<bean class="org.mytest.postProcessor.MyBeanDefinitionRegistryPostProcessor"></bean>
+
+	<bean id="xmlPostProcessor" class="org.mytest.postProcessor.MyXmlBeanFactoryPostProcessor"></bean>
+
 </beans>
