@@ -3,6 +3,7 @@ package org.mytest.postProcessor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+/*
 
 public class MyClasspathXmlApplicationContext extends ClassPathXmlApplicationContext {
 
@@ -18,3 +19,4 @@ public class MyClasspathXmlApplicationContext extends ClassPathXmlApplicationCon
 		super.customizeBeanFactory(beanFactory);
 	}
 }
+*/
