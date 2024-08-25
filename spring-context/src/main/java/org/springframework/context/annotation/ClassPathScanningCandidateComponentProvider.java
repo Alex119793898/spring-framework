@@ -315,6 +315,8 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 			return addCandidateComponentsFromIndex(this.componentsIndex, basePackage);
 		}
 		else {
+			//获取package下所有class文件，并转换成Resource -> MetadataReader读取数据进行判断。
+			//如果满足isCandidateComponent方法的逻辑，则创建ScannedGenericBeanDefinition对象封装Bean信息
 			return scanCandidateComponents(basePackage);
 		}
 	}
@@ -429,7 +431,14 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				}
 				try {
 					MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
+
+					//判断该类是否允许被Spring识别
+
+					//*************************** 前边初始化 DefaultTypeFilter时候的伏笔 ***************************
+					//根据配置 context:include-filter 和 context:exclude-filter 规则进行过滤，
+					//如果都没有配置，则此时 includeFilters 属性中有默认值 @Component ，所以此处只会保留包含 @Component注解的类。
 					if (isCandidateComponent(metadataReader)) {
+						//创建BeanDefinition封装Bean信息
 						ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 						sbd.setSource(resource);
 						if (isCandidateComponent(sbd)) {
@@ -492,7 +501,12 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 			}
 		}
 		for (TypeFilter tf : this.includeFilters) {
+
+			//*************************** 前边初始化 DefaultTypeFilter时候的伏笔 ***************************
+			//根据配置 context:include-filter 和 context:exclude-filter 规则进行过滤，
+			//如果都没有配置，则此时 includeFilters 属性中有默认值 @Component ，所以此处只会保留包含 @Component注解的类。
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
+				//检查 @Conditional 注解
 				return isConditionMatch(metadataReader);
 			}
 		}
