@@ -1861,6 +1861,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
+		// context.getBean("&myFactoryBean"); ----------> 到此处 name 被转换为 myFactoryBean
+		// context.getBean("myFactoryBean"); ----------> 到此处 name 被转换为 myFactoryBean
+		// 判断通过 myFactoryBean 这个beanName 是不是一个 FactoryBean
+		// 是 FactoryBean 就直接返回 FactoryBean 实例
+		// 不是 FactoryBean 通过后续的 getCachedObjectForFactoryBean / getObjectFromFactoryBean，从缓存中获取，还是 getObjectFromFactoryBean 创建一个 User 出来
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
