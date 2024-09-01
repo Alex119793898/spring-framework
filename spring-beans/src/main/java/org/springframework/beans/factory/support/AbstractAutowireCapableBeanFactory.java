@@ -518,6 +518,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Prepare method overrides.
+		// 验证及准备覆盖的方法 lookup-method replace-method
 		try {
 			mbdToUse.prepareMethodOverrides();
 		}
