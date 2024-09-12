@@ -1382,13 +1382,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	@SuppressWarnings("deprecation")  // for postProcessPropertyValues
 	protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
+		//如果beanWrapper为空
 		if (bw == null) {
+			//如果mbd 有需要填充的属性
 			if (mbd.hasPropertyValues()) {
 				throw new BeanCreationException(
 						mbd.getResourceDescription(), beanName, "Cannot apply property values to null instance");
 			}
 			else {
 				// Skip property population phase for null instance.
+				//没有需要填充的属性 直接跳过
 				return;
 			}
 		}
@@ -1396,16 +1399,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Give any InstantiationAwareBeanPostProcessors the opportunity to modify the
 		// state of the bean before properties are set. This can be used, for example,
 		// to support styles of field injection.
+		// 否是"synthetic"。一般是指只有AOP相关的pointCut配置或者Advice配置才会将 synthetic设置为true
+		// 如果mdb是不是'syntheic'且工厂拥有InstantiationAwareBeanPostProcessor
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+			//遍历工厂中的BeanPostProcessor对象
 			for (InstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().instantiationAware) {
+				//postProcessAfterInstantiation：一般用于设置属性
+				// 给任何实现了InstantiationAwareBeanPostProcessors的子类机会去修改bean的状态再设置属性之前，可以被用来支持类型的字段注入
 				if (!bp.postProcessAfterInstantiation(bw.getWrappedInstance(), beanName)) {
 					return;
 				}
 			}
 		}
-
+		//如果mdb有PropertyValues就获取其PropertyValues
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
-
+		// 获取 mbd 的 自动装配模式
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
@@ -1465,19 +1473,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected void autowireByName(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
-
+		//获取bw中有setter方法 && 非简单类型属性 && mbd的PropertyValues中没有该pd的属性名的 PropertyDescriptor 属性名数组
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
+		//遍历属性名
 		for (String propertyName : propertyNames) {
+			//如果该bean工厂有propertyName的beanDefinition或外部注册的singleton实例
 			if (containsBean(propertyName)) {
+				//获取该工厂中propertyName的bean对象
 				Object bean = getBean(propertyName);
+				//将propertyName,bean添加到pvs中
 				pvs.add(propertyName, bean);
+				//注册propertyName与beanName的依赖关系
 				registerDependentBean(propertyName, beanName);
+				//打印跟踪日志
 				if (logger.isTraceEnabled()) {
 					logger.trace("Added autowiring by name from bean name '" + beanName +
 							"' via property '" + propertyName + "' to bean named '" + propertyName + "'");
 				}
 			}
 			else {
+				//打印跟踪日志
 				if (logger.isTraceEnabled()) {
 					logger.trace("Not autowiring property '" + propertyName + "' of bean '" + beanName +
 							"' by name: no matching bean found");
@@ -1549,14 +1564,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected String[] unsatisfiedNonSimpleProperties(AbstractBeanDefinition mbd, BeanWrapper bw) {
 		Set<String> result = new TreeSet<>();
+		//获取mdbd的所有属性值
 		PropertyValues pvs = mbd.getPropertyValues();
+		//PropertyDescriptor:表示JavaBean类通过存储器导出一个属性，获取bw的所有属性描述对象
 		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
+		//遍历属性描述对象
 		for (PropertyDescriptor pd : pds) {
+			//如果 pd有写入属性方法 && 该pd不是被排除在依赖项检查之外 && pvs没有该pd的属性名 && pd的属性类型不是"简单值类型"
 			if (pd.getWriteMethod() != null && !isExcludedFromDependencyCheck(pd) && !pvs.contains(pd.getName()) &&
 					!BeanUtils.isSimpleProperty(pd.getPropertyType())) {
 				result.add(pd.getName());
 			}
 		}
+		//将result装换成数组
 		return StringUtils.toStringArray(result);
 	}
 
@@ -1608,6 +1628,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #ignoreDependencyInterface(Class)
 	 */
 	protected boolean isExcludedFromDependencyCheck(PropertyDescriptor pd) {
+		//pd的属性是CGLIB定义的属性 || 该工厂的忽略依赖类型列表中包含该pd的属性类型 || pd的属性是ignoredDependencyInterfaces里面的接口定义的方法
 		return (AutowireUtils.isExcludedFromDependencyCheck(pd) ||
 				this.ignoredDependencyTypes.contains(pd.getPropertyType()) ||
 				AutowireUtils.isSetterDefinedInInterface(pd, this.ignoredDependencyInterfaces));

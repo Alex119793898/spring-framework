@@ -500,6 +500,19 @@ public abstract class ClassUtils {
 	 */
 	public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
 		Assert.notNull(clazz, "Class must not be null");
+		/**
+		 * clazz.isPrimitive()内部用于判断
+		 * See Also:
+		 * Boolean.TYPE,
+		 * Character.TYPE,
+		 * Byte.TYPE,
+		 * Short.TYPE,
+		 * Integer.TYPE,
+		 * Long.TYPE,
+		 * Float.TYPE,
+		 * Double.TYPE,
+		 * Void.TYPE
+		 */
 		return (clazz.isPrimitive() || isPrimitiveWrapper(clazz));
 	}
 
