@@ -528,11 +528,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			//---------------------------------------------------------------------------------------
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// 再次进入 resolveBeforeInstantiation
+			// 关键步骤三：就是在此自定义 BeforeInstantiantion 实例化
+			// 此处实例化以后，不需要 后边的 doCreateBean 来执行创建 Bean 了
+			//---------------------------------------------------------------------------------------
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
 			}
+			//---------------------------------------------------------------------------------------
+			// 最终我们自己 new BeforeInstantiantion(); 也会被放入 singletonObjects 一级缓存中
+			// 不再需要后边的 doCreateBean 来创建对象
+			//---------------------------------------------------------------------------------------
 		}
 		catch (Throwable ex) {
 			throw new BeanCreationException(mbdToUse.getResourceDescription(), beanName,
@@ -1133,6 +1142,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 				Class<?> targetType = determineTargetType(beanName, mbd);
 				if (targetType != null) {
+					// 此处就会调用 myInstantiationAwareBeanPostProcessor 中我们自己实例化的 BeforeInstantiantion 对象
 					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
 					if (bean != null) {
 						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
@@ -1158,6 +1168,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Nullable
 	protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
 		for (InstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().instantiationAware) {
+			// 调用 自定义 的方法：其中我们 return new BeforeInstantiantion();
 			Object result = bp.postProcessBeforeInstantiation(beanClass, beanName);
 			if (result != null) {
 				return result;
