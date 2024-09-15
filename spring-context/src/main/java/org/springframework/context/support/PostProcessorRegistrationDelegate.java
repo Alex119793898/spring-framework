@@ -338,7 +338,9 @@ final class PostProcessorRegistrationDelegate {
 			((AbstractBeanFactory) beanFactory).addBeanPostProcessors(postProcessors);
 		}
 		else {
+			// 遍历postProcessors
 			for (BeanPostProcessor postProcessor : postProcessors) {
+				//将 postProcessor 添加到beanFactory,它将应用于该工厂创建的Bean。在工厂配置期间调用
 				beanFactory.addBeanPostProcessor(postProcessor);
 			}
 		}
