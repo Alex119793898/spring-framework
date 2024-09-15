@@ -193,8 +193,11 @@ final class PostProcessorRegistrationDelegate {
 		// Finally, invoke all other BeanFactoryPostProcessors.
 		List<BeanFactoryPostProcessor> nonOrderedPostProcessors = new ArrayList<>(nonOrderedPostProcessorNames.size());
 		for (String postProcessorName : nonOrderedPostProcessorNames) {
+			// 此处getBean 触发了 getBean --> doGetBean --> createBean --> doCreateBean一连串操作
+			// 创建没有添加 @Order @PriorityOrdered 等注解，自定义的 xxxBeanFactoryPostProcessors
 			nonOrderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
 		}
+		//执行 自定义的 xxxBeanFactoryPostProcessors里的 postProcessBeanFactory() 方法
 		invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);
 
 		// Clear cached merged bean definitions since the post-processors might have

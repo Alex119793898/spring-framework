@@ -549,6 +549,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			//实际创建 Bean 的实例
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Finished creating instance of bean '" + beanName + "'");
@@ -591,7 +592,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (instanceWrapper == null) {
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
+		//获取 bean 实例，准备【初始化操作】
 		Object bean = instanceWrapper.getWrappedInstance();
+		//获取 beanType， 准备【初始化操作】
 		Class<?> beanType = instanceWrapper.getWrappedClass();
 		if (beanType != NullBean.class) {
 			mbd.resolvedTargetType = beanType;
@@ -1198,6 +1201,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
 		}
 
+		//判断当前beanDefinition中是否包含实例供应器，实例供应器相当于一个回调方法，利用回调方法来创建bean
 		Supplier<?> instanceSupplier = mbd.getInstanceSupplier();
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
@@ -1255,23 +1259,32 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected BeanWrapper obtainFromSupplier(Supplier<?> instanceSupplier, String beanName) {
 		Object instance;
 
+		// 获取原先创建的beanName
 		String outerBean = this.currentlyCreatedBean.get();
+		// 用当前beanName作对做替换
 		this.currentlyCreatedBean.set(beanName);
 		try {
+			// ------------------------------------------------------------------------------------------
+			// 通过调用supplier的get方法,返回一个实例
+			// ------------------------------------------------------------------------------------------
 			instance = instanceSupplier.get();
 		}
 		finally {
+			// 设置 原先创建的beanName
 			if (outerBean != null) {
 				this.currentlyCreatedBean.set(outerBean);
 			}
 			else {
+				//移除
 				this.currentlyCreatedBean.remove();
 			}
 		}
-
+		// 如果没有创建对象，默认为NullBean
 		if (instance == null) {
 			instance = new NullBean();
 		}
+		// 初始化BeanWrapper
+		// 然后返回
 		BeanWrapper bw = new BeanWrapperImpl(instance);
 		initBeanWrapper(bw);
 		return bw;
