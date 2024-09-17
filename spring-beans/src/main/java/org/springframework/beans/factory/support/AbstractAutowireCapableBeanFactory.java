@@ -1206,8 +1206,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
-
+		//如果工厂方法不为空，则使用工厂方法处理化策略
 		if (mbd.getFactoryMethodName() != null) {
+			// 根据执行bean使用对应的策略创建新的实例，如，工厂方法，构造函数主动注入、简单初始化
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 

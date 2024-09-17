@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!-- 方式一： 静态工厂类方式 -->
+	<bean id="person"
+		  class="org.mytest.factoryMethod.PersonStaticFactory"
+		  factory-method="getPerson"
+	>
+		<!--constructor-arg：可以为方法指定参数-->
+		<constructor-arg value="123"></constructor-arg>
+	</bean>
+	<!--
+	  两种方式不同
+	  静态工厂直接指定的class 是静态工厂类
+	  实例工厂指定的class 需要指定实际的Person.class
+	 -->
+
+	<!-- 方式二： 实例工厂类方式 -->
+	<bean id="personInstanceFactory" class="org.mytest.factoryMethod.PersonInstanceFactory"></bean>
+	<!--
+	factory-bean 指定哪个实例工厂
+	factory-method 指定使用哪个工厂实例方法
+	-->
+	<bean id="person2"
+		  class="org.mytest.factoryMethod.Person"
+		  factory-bean="personInstanceFactory"
+		  factory-method="getPerson"
+	>
+		<constructor-arg value="wangwu"></constructor-arg>
+	</bean>
+</beans>
