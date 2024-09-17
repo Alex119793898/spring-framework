@@ -261,7 +261,18 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		this.lookupMethodsChecked.remove(beanName);
 		this.injectionMetadataCache.remove(beanName);
 	}
+	/*
+	主要操作
+		1.获取构造器集合
+			* 如果有多个 Autowired，required 为 true，不管有没有默认构造方法，会报异常
 
+     		* 如果只有一个 Autowired ， required 为 false ，没有默认构造方法，会报警告
+
+     		* 其他情况都可以，但是以有**Autowired**的构造方法优先，然后才是默认构造方法
+
+   		2.没有xml配置 bean ，通过 component-scan 扫描 @Component 的Person
+     		* 如果没有 Autowired 注解，定义了两个及以上有参数的构造方法，没有无参构造方法，就会报错【但是不是这里报错的】
+	 */
 	@Override
 	@Nullable
 	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, final String beanName)
