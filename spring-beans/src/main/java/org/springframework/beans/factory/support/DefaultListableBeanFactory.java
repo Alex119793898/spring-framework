@@ -1353,7 +1353,6 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 
 			//获取descriptor的依赖类型
-			//这里是 Address
 			Class<?> type = descriptor.getDependencyType();
 
 			//尝试使用descriptor的默认值作为最近候选Bean对象
@@ -1480,9 +1479,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				autowiredBeanNames.add(autowiredBeanName);
 			}
 
-			//如果instanceCandidate是Class实例
+			//-----------------------------------------【重点关注】----------------------------------------
+			// 如果instanceCandidate是Class实例
+			// 当前 @Autowired 修饰的 PersonService 对应的 PersonService.class
+			// 进入此条件
+			//-----------------------------------------【重点关注】----------------------------------------
 			if (instanceCandidate instanceof Class) {
-				//让instanceCandidate引用 descriptor对autowiredBeanName解析为该工厂的Bean实例
+				/*-----------------------------------------【重点关注】------------------------------
+				 【重点关注】此处使用的 autowiredBeanName 获取candidateName的该工厂的Bean实例：【实际就是 byName 方式查找/创建 bean】
+				 【重点关注】【总结：@Autowired 实际就是 byType + byName 方式注入的】
+			  	------------------------------------------【重点关注】------------------------------*/
 				instanceCandidate = descriptor.resolveCandidate(autowiredBeanName, type, this);
 			}
 
@@ -1507,6 +1513,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 
 			//返回最佳候选Bean对象【result】
+			//-----------------------------------------【重点关注】------------------------------
+			//返回最佳候选Bean对象【result】
+			//下一页继续分析：
+			// 返回的 personService 实例对象返回到 inject()
+			// 返回到 AutowiredFieldElement 类的 resolveFieldValue()
+			// 返回到 AutowiredFieldElement 类的 inject() 最终通过反射被设置到 Filed 属性中
+			//-----------------------------------------【重点关注】------------------------------
 			return result;
 		}
 		finally {
