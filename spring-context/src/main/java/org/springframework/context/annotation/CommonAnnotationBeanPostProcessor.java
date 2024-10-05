@@ -302,7 +302,14 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+		// 处理 @PostConstruct & @PreDestroy
 		super.postProcessMergedBeanDefinition(beanDefinition, beanType, beanName);
+
+		// 处理 @Resource
+		// 与上边的 处理 @PostConstruct & @PreDestroy 方式类似
+		// 		1.findResourceMetadata
+		// 		2.checkConfigMembers -- --> 将获取的 @Resource 标注的 Filed 标注到 BeanDefinition 中
+		// 		3.知识点：@Resource @PostConstruct & @PreDestroy 全都是 JDK 提供的，@Autowired 是Spring提供
 		InjectionMetadata metadata = findResourceMetadata(beanName, beanType, null);
 		metadata.checkConfigMembers(beanDefinition);
 	}

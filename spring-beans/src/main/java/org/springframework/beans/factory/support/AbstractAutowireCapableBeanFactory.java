@@ -1217,6 +1217,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		//如果工厂方法不为空，则使用工厂方法处理化策略
 		if (mbd.getFactoryMethodName() != null) {
 			// 根据执行bean使用对应的策略创建新的实例，如，工厂方法，构造函数主动注入、简单初始化
+			//------------------------------------------------------------------------------------------
+			// 进入策略模式途径一：factoryMethod 方式实例化
+			//------------------------------------------------------------------------------------------
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
@@ -1264,6 +1267,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 4、有参与构造函数参数列表的参数
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
+			//------------------------------------------------------------------------------------------
+			//进入策略模式途径二：传入有参构造方法方式实例化
+			//------------------------------------------------------------------------------------------
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
@@ -1277,6 +1283,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// No special handling: simply use no-arg constructor.
 		// 使用默认无参构造函数创建对象，如果没有无参构造且存在多个有参构造且没有@AutoWired注解构造，会报错
+		//------------------------------------------------------------------------------------------
+		// 进入策略模式途径三入口：不穿入构造方法，直接使用无参构造方法方式实例化
+		//------------------------------------------------------------------------------------------
 		return instantiateBean(beanName, mbd);
 	}
 
