@@ -98,11 +98,16 @@ public class InjectionMetadata {
 		return this.targetClass != clazz;
 	}
 
+	/**
+	 * 如果集合中有注解的属性和方法，就会将它们注册到beanDefinition的集合externallyManagedConfigMembers中
+	 * @param beanDefinition
+	 */
 	public void checkConfigMembers(RootBeanDefinition beanDefinition) {
 		Set<InjectedElement> checkedElements = new LinkedHashSet<>(this.injectedElements.size());
 		for (InjectedElement element : this.injectedElements) {
 			Member member = element.getMember();
 			if (!beanDefinition.isExternallyManagedConfigMember(member)) {
+				//将@Resource标注的 Field 与 Method 注册到 BeanDefinition 中
 				beanDefinition.registerExternallyManagedConfigMember(member);
 				checkedElements.add(element);
 			}
